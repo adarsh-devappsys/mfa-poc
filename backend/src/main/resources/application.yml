@@ -26,7 +26,7 @@ app:
     expiration-seconds: 300
     length: 6
   cors:
-    allowed-origins: http://localhost:4200
+    allowed-origins: http://localhost:58959
 
 logging:
   level:

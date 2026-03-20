@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { MfaStatus, TotpSetupResponse } from '../../models/auth.models';
 import { startRegistration } from '@simplewebauthn/browser';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-mfa-setup',
@@ -89,7 +90,7 @@ import { startRegistration } from '@simplewebauthn/browser';
             <small class="text-muted">Use biometric or hardware security key</small>
           </div>
           <span *ngIf="mfaStatus?.passkeyEnabled" class="badge bg-success">
-            {{ mfaStatus.passkeyCount }} registered
+            {{ mfaStatus?.passkeyCount || '0' }} registered
           </span>
         </div>
 
@@ -185,7 +186,8 @@ export class MfaSetupComponent implements OnInit {
   async registerPasskey(): Promise<void> {
     this.clearMessages();
     try {
-      const options = await this.authService.getPasskeyRegistrationOptions().toPromise();
+      const response = await firstValueFrom(this.authService.getPasskeyRegistrationOptions());
+      const options = response.publicKey || response;
       const credential = await startRegistration(options);
 
       this.authService.registerPasskey(credential).subscribe({

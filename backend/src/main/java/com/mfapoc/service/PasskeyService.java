@@ -30,7 +30,8 @@ public class PasskeyService {
     private final Map<String, String> registrationChallenges = new ConcurrentHashMap<>();
     private final Map<String, String> assertionChallenges = new ConcurrentHashMap<>();
 
-    public PasskeyService(PasskeyCredentialRepository credentialRepository) {
+    public PasskeyService(PasskeyCredentialRepository credentialRepository,
+                         @org.springframework.beans.factory.annotation.Value("${app.cors.allowed-origins}") String allowedOrigins) {
         this.credentialRepository = credentialRepository;
 
         CredentialRepositoryAdapter credentialRepo = new CredentialRepositoryAdapter(credentialRepository);
@@ -43,7 +44,7 @@ public class PasskeyService {
         this.relyingParty = RelyingParty.builder()
                 .identity(rpIdentity)
                 .credentialRepository(credentialRepo)
-                .origins(Set.of("http://localhost:4200"))
+                .origins(Set.of(allowedOrigins))
                 .build();
     }
 
@@ -67,7 +68,7 @@ public class PasskeyService {
 
         try {
             String optionsJson = creationOptions.toCredentialsCreateJson();
-            registrationChallenges.put(user.getUsername(), objectMapper.writeValueAsString(creationOptions));
+            registrationChallenges.put(user.getUsername(), creationOptions.toJson());
 
             return objectMapper.readValue(optionsJson, Map.class);
         } catch (JsonProcessingException e) {
@@ -122,7 +123,7 @@ public class PasskeyService {
 
         try {
             String optionsJson = assertionRequest.toCredentialsGetJson();
-            assertionChallenges.put(user.getUsername(), objectMapper.writeValueAsString(assertionRequest));
+            assertionChallenges.put(user.getUsername(), assertionRequest.toJson());
 
             return objectMapper.readValue(optionsJson, Map.class);
         } catch (JsonProcessingException e) {

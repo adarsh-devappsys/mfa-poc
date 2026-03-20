@@ -1,7 +1,9 @@
 package com.mfapoc.service;
 
 import dev.samstevens.totp.code.*;
+import dev.samstevens.totp.exceptions.QrGenerationException;
 import dev.samstevens.totp.qr.QrData;
+import dev.samstevens.totp.qr.QrGenerator;
 import dev.samstevens.totp.qr.ZxingPngQrGenerator;
 import dev.samstevens.totp.secret.DefaultSecretGenerator;
 import dev.samstevens.totp.secret.SecretGenerator;
@@ -29,10 +31,15 @@ public class TotpService {
                 .period(30)
                 .build();
 
-        return Utils.getDataUriForImage(
-                new ZxingPngQrGenerator().generate(data),
-                new ZxingPngQrGenerator().getImageMimeType()
-        );
+        try {
+            QrGenerator generator = new ZxingPngQrGenerator();
+            return Utils.getDataUriForImage(
+                    generator.generate(data),
+                    generator.getImageMimeType()
+            );
+        } catch (QrGenerationException e) {
+            throw new RuntimeException("Failed to generate QR code", e);
+        }
     }
 
     public boolean verifyCode(String secret, String code) {

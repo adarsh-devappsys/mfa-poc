@@ -41,7 +41,7 @@ public class User {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     public boolean hasMfaEnabled() {
-        return totpEnabled || otpEnabled || hasPasskeys();
+        return totpEnabled || otpEnabled || isHasPasskeys();
     }
 
     // This is checked via the repository - passkeys are in a separate table

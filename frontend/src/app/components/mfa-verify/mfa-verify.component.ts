@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { startAuthentication } from '@simplewebauthn/browser';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-mfa-verify',
@@ -176,7 +177,8 @@ export class MfaVerifyComponent implements OnInit {
     this.error = '';
 
     try {
-      const options = await this.authService.getPasskeyAssertionOptions().toPromise();
+      const response = await firstValueFrom(this.authService.getPasskeyAssertionOptions());
+      const options = response.publicKey || response;
       const assertion = await startAuthentication(options);
 
       this.authService.verifyPasskey(assertion).subscribe({
