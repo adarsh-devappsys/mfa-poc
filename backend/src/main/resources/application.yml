@@ -1,0 +1,33 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:mfadb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+app:
+  jwt:
+    secret: MFA-POC-SECRET-KEY-CHANGE-IN-PRODUCTION-MIN-256-BITS-LONG-ENOUGH
+    expiration-ms: 3600000
+    pre-auth-expiration-ms: 300000
+  otp:
+    expiration-seconds: 300
+    length: 6
+  cors:
+    allowed-origins: http://localhost:4200
+
+logging:
+  level:
+    com.mfapoc: DEBUG
